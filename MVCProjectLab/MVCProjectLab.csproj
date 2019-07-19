@@ -242,6 +242,7 @@
       <DependentUpon>ModelDB.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\ProductDataAnnontation.cs" />
+    <Compile Include="MohamedFeto.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ViewModels\OrderViewModel.cs" />
   </ItemGroup>
