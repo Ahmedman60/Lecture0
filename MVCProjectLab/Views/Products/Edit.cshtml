@@ -1,0 +1,102 @@
+﻿@model MVCProjectLab.Models.Product
+
+@{
+    ViewBag.Title = "Edit";
+}
+
+<h2>Edit</h2>
+
+@using (Html.BeginForm("Edit", "Products", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    
+    <div class="form-horizontal">
+        <h4>Product</h4>
+        <hr />
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        @Html.HiddenFor(model => model.ID)
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.ProductName, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.ProductName, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.ProductName, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Price, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Price, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Price, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Photo, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @*@Html.EditorFor(model => model.Photo, new { htmlAttributes = new { @class = "form-control" } })*@
+                <input type="file" name="FilePhoto" class="form-control" id="FilePhoto" />
+                @Html.ValidationMessageFor(model => model.Photo, "", new { @class = "text-danger" })
+                <img id="ShowImage" src="@Url.Action("MyAction", "Products", new {@name="Photo", path =Model.Photo })" />
+                <p id="Error"></p>
+
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Save" class="btn btn-default" />
+            </div>
+        </div>
+    </div>
+}
+
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>
+
+@section Styles{
+    <style>
+        #ShowImage {
+            height: 200px;
+            border: 1px solid #000;
+            margin: 10px 5px 0 0;
+            float: left;
+        }
+
+        #Error {
+            color: red;
+        }
+    </style>
+}
+
+@section Scripts{
+    <script src="~/Scripts/jquery.validate.min.js"></script>
+    <script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>
+
+    <script>
+     function showImage(src, target) {
+            var fr = new FileReader();
+            fr.onload = function () {
+                target.src = fr.result; //<img src="H://file1.jpg" />
+            }
+            fr.readAsDataURL(src.files[0]);
+        }
+        function putImage() {
+            if (!document.getElementById("FilePhoto").files[0].type.match('image.*')) {
+                document.getElementById("ShowImage").style["display"] = "none";
+                document.getElementById("Error").innerHTML = "Please Select Image File";
+                document.getElementById("FilePhoto").value = "";
+            }
+            else {
+                document.getElementById("Error").innerHTML = "";
+                var src = document.getElementById("FilePhoto");
+                var target = document.getElementById("ShowImage");
+                target.style["display"] = "block";
+                showImage(src, target);
+            }
+        }
+        document.getElementById('FilePhoto').addEventListener('change', putImage, false);
+    </script>
+}

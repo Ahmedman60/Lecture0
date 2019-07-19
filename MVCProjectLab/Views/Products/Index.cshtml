@@ -1,0 +1,128 @@
+﻿@*@using MVCProjectLab.Helpers*@
+@model IEnumerable<MVCProjectLab.Models.Product>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Index</h2>
+@Html.Action("LowProductPrice", "Products")
+<div style="display:inline-block">
+     @using (Html.BeginForm("Search","Products",FormMethod.Post))
+     {
+        <div>
+            <fieldset>
+                <legend> Search Full </legend>
+                <div> @Html.Label("ProductName")</div> <div> @Html.TextBox("ProductName",null,htmlAttributes: new { @class ="form-control"}) </div>
+                <input type="submit" name="btnsubmit" value="Search" class="btn btn-default " /> 
+            </fieldset>
+        </div>
+     }
+</div>
+<div style="display:inline-block ; float:right">
+    @using (Ajax.BeginForm("AjaxSearch", new AjaxOptions()
+    {
+        UpdateTargetId = "UpdatePanel",
+        HttpMethod = "POST",
+        InsertionMode = InsertionMode.Replace,
+        LoadingElementId = "loadingpic",
+        OnBegin = "HideData",
+        OnComplete = "ShowData"
+    }))
+    {
+             @:Partial Request <br/>
+            <label for= "ProductName" > Enter Name : </label>
+             @Html.TextBox("ProductNameAjax", null, new { @class = "form-control" })
+             <br/>
+             <input type = "submit" name = "btn2" value = "Search Ajax" id = "btn2" class="btn btn-success " />
+    }
+
+</div>
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+
+<div id="loadingpic" style="display:none">
+    <img id="loading" alt="Loading Image" src="~/Content/Images/1.gif" />
+</div>
+
+
+
+
+<div id="UpdatePanel">
+    <table class="table">
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.ProductName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Price)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Photo)
+            </th>
+            <th></th>
+        </tr>
+
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+
+                    @Html.DisplayFor(modelItem => item.ProductName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Price)
+                </td>
+                <td>
+                    @*@Html.DisplayFor(modelItem => item.Photo)*@
+
+                    @*<a href="/Products/Details/@item.ID"> <image src="Photo" </a>*@
+                    @Html.ImageActionLink("", "Details", "Products", new { id = @item.ID }, null, imageSrc: @Url.Action("MyAction", "Products", new { path = item.Photo }), imageClass: "ProductImage")
+
+                    @*<img id="ProductImage" src="@Url.Action("MyAction", "Products", new { path =item.Photo })" />*@
+
+                    
+                    
+
+                </td>
+                <td>
+                    @Html.ActionLink("Edit", "Edit", new { id = item.ID }) |
+                    @Html.ActionLink("Details", "Details", new { id = item.ID }) |
+                    @Html.ActionLink("Delete", "Delete", new { id = item.ID })
+                </td>
+            </tr>
+        }
+
+    </table>
+</div>
+
+@section Scripts{
+    
+<script src="~/Scripts/jquery.unobtrusive-ajax.min.js"></script>
+    <script>    
+        function HideData() {
+            document.getElementById("UpdatePanel").style.display ="none" ;
+
+        }
+        function ShowData() {
+            document.getElementById("UpdatePanel").style.display = "block";
+
+        }
+    </script>
+}
+@section Styles{
+    <style>
+        td {
+            vertical-align: middle;
+        }
+
+        .ProductImage {
+            height: 50px;
+            border: 1px solid #000;
+            -moz-border-radius: 10px;
+            -webkit-border-radius: 10px;
+            border-radius: 10px;
+        }
+    </style>
+}

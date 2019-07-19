@@ -1,0 +1,282 @@
+﻿@model MVCProjectLab.ViewModels.OrderViewModel
+@{
+    ViewBag.Title = "AddOrder";
+}
+
+<h2>AddOrder</h2>
+<div class="form-horizontal">
+    <div><label for="OrderDate">Order Date</label></div>
+    <div><input type="text" name="OrderDate" value="" id="OrderDate" class="form-control" /></div>
+    @*<input type="text" name="ProductName" id="ProductName" />*@
+    <div><label for="EmployeeID">Employee</label></div>
+    <div>@Html.DropDownListFor(q => q.EmployeeID, ViewBag.EmployeeID as SelectList, new { @class = "form-control" })</div>
+    <div><label for="CustomerID">Customer</label></div>
+    <div>@Html.DropDownListFor(q => q.CustomerID, ViewBag.CustomerID as SelectList, new { @class = "form-control" })</div>
+
+    <div><label for="Total">Total</label></div>
+    <div><input type="number" name="Total" value="" id="Total" class="form-control" /></div>
+
+</div>
+
+<br />
+<table class="table table-responsive" id="ItemsList">
+    <tr>
+        <th>Products</th>
+        <th> Price</th>
+        <th> Quantity</th>
+        <th>Total Price</th>
+        <th></th>
+    </tr>
+    <tr id="HeadRow">
+        <td>
+            @Html.DropDownList("ProductID", ViewBag.ProductID as SelectList, " Select Product ", new { @class = "ProductID form-control" })
+            <span class="error text-danger"></span>
+        </td>
+        <td>
+            <input type="text" value="" id="Price" class="Price form-control" oninput="Calc();" />
+            <span class="error text-danger"></span>
+        </td>
+        <td>
+            <input type="text" value="" id="Quantity" class="Quantity form-control" oninput="Calc();" />
+            <span class="error text-danger"></span>
+        </td>
+        <td>
+            <input type="text" value="" id="TotalPrice" class="TotalPrice form-control"  disabled="disabled" />
+        </td>
+        <td>
+            <button type="button" value="" id="btnAdd" class="btnAdd form-control btn-success" >Add</button>
+        </td>
+    </tr>
+</table>
+
+<h4> Order Details </h4>
+<table class="table-responsive" id="ShowDetails"></table>
+
+<button type="button" name="submit" value="" id="submit" class="submit btn btn-default"> Add Order </button>
+<span class="text-danger" id="OrderError"></span>
+
+@section Scripts{
+    <script src="~/Scripts/jquery.unobtrusive-ajax.min.js"></script>
+    <script>
+        //التعديل اهو
+        function Calc() {
+            var price = parseFloat(document.getElementById('Price').value);
+            var quantity = parseFloat(document.getElementById('Quantity').value);
+            document.getElementById('TotalPrice').value = price * quantity;
+        }
+
+            
+    </script>
+    <script>
+        //Here i will try to make the dropdownlist ajax
+
+        
+
+        $("#ProductID").change(function () {
+            //when change or select new value this code pass your selected country id to method  and method return data
+            $.get("/Orders/GetPrice",
+
+                {
+                    ProductID: $("#ProductID").val()
+                },
+
+
+                function (data) {
+                    alert(data);
+                    document.getElementById("Price").value = data;
+                     
+                }
+
+            )
+        });
+
+   
+        //$("#ProductID").change(function () {
+
+        //    $.get("/Orders/GetPrice", { ProductID: $("#ProductID").val() }, function (data) {
+        //        $("#TotalPrice").val(data)
+        //    })
+
+           
+   
+            
+       
+    </script>
+
+    <script>
+        $("#OrderDate").datepicker({
+
+            
+            changeMonth: true,
+            changeYear: true,
+            
+        });
+       
+           
+        
+    </script>
+
+
+    <script>
+        $(function () {
+           
+            $("#btnAdd").click(function () {
+                var isVaild = true;
+
+                if (document.getElementById("ProductID").selectedIndex == 0) {
+                    $("#ProductID").siblings('span.error').text("Please select Product");
+                    isVaild = false;
+                }
+                else {
+                    $("#ProductID").siblings('span.error').text("");
+                }
+                if (!($("#Price").val().trim() != "" && (parseInt($('#Price').val()) || 0))) {
+                    $("#Price").siblings('span.error').text("Please Enter Price");
+                    isVaild = false;
+                }
+                else {
+                    $("#Price").siblings('span.error').text("");
+                }
+
+                if (!($("#Quantity").val().trim() != "" && (parseInt($('#Quantity').val()) || 0))) {
+                    $("#Quantity").siblings('span.error').text("Please Enter Quantity");
+                    isVaild = false;
+                }
+                else {
+                    $("#Quantity").siblings('span.error').text("");
+                }
+
+
+                if (isVaild) {
+                    //to get the total
+                     //التعديل اهو
+                    var netTotal = parseInt($("#Quantity").val()) * parseFloat($("#Price").val())
+                    $("#TotalPrice").val(netTotal);
+                    var i = Number(document.getElementById("Total").value);
+                    document.getElementById("Total").value = i+Number(netTotal);
+
+                    //Get Data
+                    var productid = document.getElementById("ProductID").value;
+
+
+                    // Clone
+                    var $NewRow = $("#HeadRow").clone().removeAttr('id');
+
+
+                    $(".ProductID", $NewRow).val(productid);
+                    //button
+                    $("#btnAdd", $NewRow).addClass("remove").html('Remove').removeClass('btn-success').addClass('btn-danger'); //
+                    $("#ProductID,#Quantity,#Price", $NewRow).attr('disabled', true);
+
+                    $("#ProductID, #Quantity ,#Price ,#TotalPrice", $NewRow).removeAttr('id');
+                    $("span.error", $NewRow).remove();
+
+                    $("#ShowDetails").append($NewRow[0]);
+                  
+                    Resetinput();
+
+
+                }
+            });
+
+            // to reset
+            function Resetinput() {
+                document.getElementById("ProductID").selectedIndex = 0;
+                $("#Quantity").val('');
+                $("#Price").val('');
+                $("#TotalPrice").val('');
+            }
+            //Remove
+            $("#ShowDetails").on("click", ".remove", function () {
+                
+                //التعديل اهو
+                //var t = Number($(this).siblings(".TotalPrice").children(" td .TotalPrice").val());
+                //// فى مشكله بيمسح الtotal
+               
+                //var current = Number(document.getElementById("Total").value);
+                //document.getElementById("Total").value = current - t;
+                $(this).parents("tr").remove();
+                var TotalSum = [];
+                            
+                $("#ShowDetails tr").each(function () {
+                    var item = $('.TotalPrice', this).val()
+                   
+                    TotalSum.push(item);
+                })
+                var Sum=0;
+                for (var i = 0; i < TotalSum.length; i++) {
+                    Sum += eval(TotalSum[i]);
+                }
+                document.getElementById("Total").value = Sum;
+
+
+
+
+
+            })
+
+            $("#submit").click(function () {
+                //to validation Orders
+                isVaild = true;
+                //To List Of Product in Order Details
+                var ProductsList = [];
+
+                //Fill List From Each Row in table  (tr)
+                $("#ShowDetails tr").each(function () {
+                    var item = {
+                        ProductID: $('select.ProductID', this).val(),
+                        Price: $('.Price', this).val(),
+                        Quantity: $('.Quantity', this).val(),
+                        TotalPrice: $('.TotalPrice', this).val()
+                    };
+                    ProductsList.push(item);
+                });
+
+                if (ProductsList.length == 0) {
+                    $("#OrderError").text("Please Enter Products To this Order");
+                    isVaild = false;
+                }
+                if (isVaild) {
+                    var Order = {
+                        OrderDate: $("#OrderDate").val(),
+                        EmployeeID: $('select#EmployeeID').val(),
+                        CustomerID: $('select#CustomerID').val(),
+                        Total: $('#Total').val(),
+                        ListOfProducts: ProductsList
+                    }
+
+                    $("#submit").attr('disabled', true);
+                    $("#submit").html('wait to Finishing...');
+
+                    $.ajax({
+                        url: '/Orders/AddOrder',
+                        type: 'POST',
+                        data: JSON.stringify(Order),
+                        contentType: 'application/json; charset=utf-8',
+                        success: function (data) {
+
+                            SaveDone();
+                        },
+                        error: function () {
+                            $("#OrderError").text("Orders Not Created ...!!");
+                        }
+                    });
+                }
+
+                function SaveDone() {
+                    $("#OrderError").text("Order Done ...");
+                    $("#OrderError").addClass("text-success");
+
+                    $("#submit").attr('disabled', false);
+                    $("#submit").html('submit');
+
+                    $("#ShowDetails").empty();
+                    $("#OrderDate").val('');
+                    document.getElementById("EmployeeID").selectedIndex = 0;
+                    document.getElementById("CustomerID").selectedIndex = 0;
+                    $("#Total").val('');
+                }
+            });
+        });
+    </script>
+}
