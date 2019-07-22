@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Entity;
@@ -21,6 +22,7 @@ namespace MVCProjectLab.Controllers
         // GET: Products
         public ActionResult Index()
         {
+            MohamedFeto.CompareFeto<int>(1, 2, () => { Console.WriteLine("Hello World"); });
             return View(db.Products.ToList());
         }
 
@@ -170,6 +172,7 @@ namespace MVCProjectLab.Controllers
         //[HandleError(View = "_NotFoundImage")]
         public ActionResult MyAction(string path)
         {
+            
             try
             {
                     path = Path.Combine(Server.MapPath("~/Upload/Images/") + path);
