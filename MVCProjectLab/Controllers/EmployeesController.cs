@@ -7,7 +7,8 @@ using System.Net;
 using System.Web;
 using System.Web.Mvc;
 using MVCProjectLab.Models;
-
+using PagedList;
+using PagedList.Mvc;
 namespace MVCProjectLab.Controllers
 {
     public class EmployeesController : Controller
@@ -15,10 +16,69 @@ namespace MVCProjectLab.Controllers
         private MVCProjectsDBEntities db = new MVCProjectsDBEntities();
 
         // GET: Employees
-        public ActionResult Index()
+        //[HttpGet]
+        //public ActionResult Index(int? page)
+        //{
+        //    var employees = db.Employees.Include(e => e.Department).ToList();
+        //    return View(employees.ToPagedList(page??1,3));
+        //}
+
+        public ActionResult Index(string SearchBy, string search, int? page ,string sortby)
         {
-            var employees = db.Employees.Include(e => e.Department);
-            return View(employees.ToList());
+            //sorting by
+            ViewBag.SortNameParameter = string.IsNullOrEmpty(sortby) ? "Name desc" : "";
+            ViewBag.SortSalaryParameter = sortby == "Salary" ? "Salary desc" : "Salary";
+            //because Querystring doesn't work
+            if (search != null)
+            {
+                TempData["HoldSearch"] = search;
+                TempData["HoldSearch2"] = SearchBy;
+                TempData.Keep();
+            }
+            else
+            {
+                search = (string)TempData["HoldSearch"];
+                SearchBy= (string)TempData["HoldSearch2"];
+                TempData.Keep();
+            }
+
+            var Emp = db.Employees.AsQueryable();
+            //63
+            if (SearchBy == "Department")
+            {
+                Emp = db.Employees.Where(e => e.Department.Name == search || search == null);                               
+            }
+            else if (SearchBy == "Name")
+            {                //Name search
+                Emp = db.Employees.Where(e => e.Name.StartsWith(search) || search == null);
+                              
+            }
+            else
+            {
+                Emp = db.Employees.Include(e => e.Department);
+                
+            }
+
+            switch (sortby)
+            {
+                case "Name desc":
+                    Emp = Emp.OrderByDescending(x => x.Name);
+                    break;
+
+                case "Salary desc":
+                    Emp = Emp.OrderByDescending(x => x.Salary);
+                    break;
+                case "Salary":
+                    Emp = Emp.OrderBy(x => x.Salary);
+                    break;
+                default:
+                    Emp = Emp.OrderBy(x => x.Name);
+                    break;
+
+            }
+            return View(Emp.ToPagedList(page??1,2));
+          
+
         }
 
         // GET: Employees/Details/5

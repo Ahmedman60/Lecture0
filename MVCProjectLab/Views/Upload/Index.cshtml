@@ -1,0 +1,78 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>File Upload Page Using Syncronization</h2>
+<style>
+    .progress {
+        position: relative;
+        width: 400px;
+        border: 1px solid #ddd;
+        padding: 1px;
+    }
+
+    .progress-bar {
+        width: 0px;
+        height: 20px;
+        background-color: #57be65;
+    }
+</style>
+@using (Ajax.BeginForm("AsyncUpload", "Upload", new AjaxOptions() { HttpMethod = "POST" }, new { enctype = "multipart/form-data" }))
+{
+
+    @Html.AntiForgeryToken();
+    <input type="file" name="file" id="fu1"  />
+    <input type="submit" value="Upload File" />
+}
+<div class="progress">
+    <div class="progress-bar">0%</div>
+</div>
+<div id="status"></div>
+
+@section Scripts
+    {
+    <script src="http://malsup.github.com/jquery.form.js"></script>
+    @*jquery for uploading file to server*@
+    <script>
+
+        (function () {
+            var bar = $('.progress-bar');
+            var percent = $('.progress-bar');
+            var status = $("#status");
+
+            $('form').ajaxForm({
+
+                beforeSend: function () {
+                    status.empty();
+                    var percentValue = '0%';
+
+                    bar.width(percentValue);
+                    percent.html(percentValue);
+
+                },
+                uploadProgress: function (event, position, total, percentComplete) {
+                    var percentValue = percentComplete + '%';
+                    bar.width(percentValue);
+                    percent.html(percentValue);
+                },
+                success: function (data) {
+                    var percentValue = '100%';
+                    bar.width(percentValue);
+                    percent.html(percentValue);
+                    $("#fu1").val();
+                    alert(data);
+                }
+                ,
+                complete: function (xhr) {
+
+                    status.html(xhr.responseText);
+                }
+
+            });
+
+        })();
+    </script>
+
+}
+
