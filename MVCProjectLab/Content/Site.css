@@ -15,4 +15,11 @@ select,
 textarea {
     max-width: 280px;
 }
+/* To Hide the Validation Summary  ctrl + L copy line */
+/*.validation-summary-errors{
+    display:none; the validation summary take this calss when it show the errors so it will be displayed
+}*/
 
+.validation-summary-valid{
+    display: none;
+}

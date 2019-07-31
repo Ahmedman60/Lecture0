@@ -16,6 +16,7 @@ namespace MVCProjectLab.Controllers
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [RequireHttps]
         public ActionResult AsyncUpload(HttpPostedFileBase  file)
         {
             int count = 0;

@@ -6,16 +6,25 @@
 
 <h2>Edit</h2>
 
+@section Styles{
+
+    <style>
+        .validation-summary-valid {
+            display: none;
+        }
+    </style>
+}
 @using (Html.BeginForm())
 {
     @Html.AntiForgeryToken()
-    
+
     <div class="form-horizontal">
         <h4>Employee</h4>
         <hr />
-        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
-        @Html.HiddenFor(model => model.ID)
 
+        @Html.HiddenFor(model => model.ID)
+        //added for the edit issue
+        @Html.Hidden("EditNameIssue", Model.Name)
         <div class="form-group">
             @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
@@ -31,6 +40,13 @@
                 @Html.ValidationMessageFor(model => model.Salary, "", new { @class = "text-danger" })
             </div>
         </div>
+        <div class="form-group">
+            @Html.LabelFor(model => model.ConfirmSalary, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.ConfirmSalary, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.ConfirmSalary, "", new { @class = "text-danger" })
+            </div>
+        </div>
 
         <div class="form-group">
             @Html.LabelFor(model => model.DepartmentID, "DepartmentID", htmlAttributes: new { @class = "control-label col-md-2" })
@@ -42,12 +58,32 @@
 
         <div class="form-group">
             <div class="col-md-offset-2 col-md-10">
-                <input type="submit" value="Save" class="btn btn-default" />
+                <input type="submit" id="btnsubmit" @*onmouseover="MouseOver('btnsubmit')" onmouseout="MouseOut('btnsubmit')"*@ value="Save" class="btn btn-default" />
             </div>
         </div>
+        @Html.ValidationSummary(false, "Please Fix the Errors then Save", new { @class = "text-danger" })
+
     </div>
 }
 
 <div>
     @Html.ActionLink("Back to List", "Index")
 </div>
+@*@section Scripts
+        {
+        //this make the page loading very bad to make it better try to separate between them make script file
+
+        <script>
+            function MouseOver(controlid)
+            {
+                var control = document.getElementById(controlid);
+
+                control.style.backgroundColor = "red";
+            }
+            function MouseOut(controlid) {
+                var control = document.getElementById(controlid);
+                control.style.backgroundColor = "gray";
+            }
+        </script>
+
+    }*@

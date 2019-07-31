@@ -19,8 +19,9 @@ namespace MVCProjectLab.Controllers
         {
             return View();
         }
+        //this method will not public in the UrL you can make it using also idenitity
 
-
+        [NonAction]
         public ActionResult Contact()
         {
             return View();

@@ -13,6 +13,7 @@ namespace MVCProjectLab.Models
     }
     public class ProductMetaData
     {
+
         public int ID { get; set; }
         [Required(ErrorMessage = "Must Enter {0}")]
         [StringLength(50, ErrorMessage = "Must Enter Less than 50 Letter")]
